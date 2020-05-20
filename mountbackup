@@ -1,0 +1,15 @@
+#!/bin/bash
+#     ////     //  ////     //
+#    // //    //  // //    //
+#   //  //   //  //  //   //
+#  //   //  //  //   //  //
+# //    // //  //    // //
+#//     ////  //     ////
+#
+#2020.05.20 - Created script to mount external backup
+#
+echo "-----------------------"
+echo "--[ Mounting backup ]--"
+echo "-----------------------"
+sudo cryptsetup open --type luks /dev/sdb2 backup
+sudo mount /dev/mapper/remote_group_backup-backup /mnt/backup

@@ -11,5 +11,5 @@
 echo "-----------------------"
 echo "--[ Mounting backup ]--"
 echo "-----------------------"
-sudo cryptsetup open --type luks /dev/sdb1 backup
+sudo cryptsetup open --type luks /dev/sdc1 backup
 sudo mount /dev/mapper/remote_group_backup-backup /mnt/backup

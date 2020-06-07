@@ -1,0 +1,44 @@
+#!/bin/bash
+#     ////     //  ////     //
+#    // //    //  // //    //
+#   //  //   //  //  //   //
+#  //   //  //  //   //  //
+# //    // //  //    // //
+#//     ////  //     ////
+#
+#20200602 - Created script to remotely backup Files
+#         - Stops all Usenet and Torrent services to prevent downloading through VPN
+#
+echo "-----------------------------------------"
+echo "--[ Stopping All Downloading Services ]--"
+echo "-----------------------------------------"
+sudo systemctl stop deluged sabnzbd nzbdrone radarr nzbhydra
+echo "-------------------------------"
+echo "--[ Connecting to WireGuard ]--"
+echo "-------------------------------"
+sudo wg-quick up wg0
+sudo wg
+echo "----------------------"
+echo "--[ Mounting Files ]--"
+echo "----------------------"
+sudo mount -t cifs //192.168.1.111/n1 /vault/n1 -o credentials=/home/nn/.smbvault
+sudo mount -t cifs
+echo "--------------------------------"
+echo "--[ Run Dry-Run Rsync? (y/n) ]--"
+echo "--------------------------------"
+read -p ""
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+  sudo rsync -anvzh --inplace --info=progress2 --delete-during --stats --ignore-existing --ignore-errors -s /vault/n1/Files/ /mnt/backup/Files/
+fi
+echo "-----------------------------"
+echo "--[ Run Real Rsync? (y/n) ]--"
+echo "-----------------------------"
+read -p ""
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+  sudo rsync -avzh --inplace --info=progress2 --delete-during --stats --ignore-existing --ignore-errors -s /vault/n1/Files/ /mnt/backup/Files/
+fi
+sudo umount -t cifs //192.168.1.111/n1
+sudo wg-quick down wg0
+sudo systemctl start deluged sabnzbd nzbdrone radarr nzbhydra

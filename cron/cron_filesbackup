@@ -1,0 +1,17 @@
+#!/bin/bash
+#     ////     //  ////     //
+#    // //    //  // //    //
+#   //  //   //  //  //   //
+#  //   //  //  //   //  //
+# //    // //  //    // //
+#//     ////  //     ////
+#
+#20200602 - Created script for cron to remotely backup Files
+#
+systemctl stop deluged sabnzbd nzbdrone radarr nzbhydra
+wg-quick up wg0
+mount -t cifs //192.168.1.111/n1 /vault/n1 -o credentials=/home/nn/.smbvault
+rsync -avzh --inplace --info=progress2 --delete-during --stats --ignore-existing --ignore-errors -s /vault/n1/Files/ /mnt/backup/Files/
+umount -t cifs //192.168.1.111/n1
+wg-quick down wg0
+systemctl start deluged sabnzbd nzbdrone radarr nzbhydra

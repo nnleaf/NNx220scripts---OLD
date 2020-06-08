@@ -6,13 +6,15 @@
 # //    // //  //    // //
 #//     ////  //     ////
 #
-#20200602 - Created script for cron to remotely backup Files
+#20200608 - Created to transfer bookstack files to nnpi
 #
 systemctl stop deluged sabnzbd nzbdrone radarr nzbhydra
 wg-quick up wg0
 mount -t cifs //192.168.1.111/files /vault/Files -o credentials=/home/nn/.smbvault
-rsync -azh --inplace --info=progress2 --delete-during --stats --ignore-existing --ignore-errors -s -e "ssh" --rsync-path="sudo rsync" /vault/Files/ /mnt/backup/Files/
+mount -t cifs //192.168.2.11/bookstack /bookstack -o credentials=/home/nn/.smbnnpi
+sudo cp $(ls -t /vault/Files/NNServer/WEB.BookStack_192.168.1.112/Backup/* | head -1) /bookstack/
 #Cleanup
+umount -t cifs //192.168.2.11/bookstack
 umount -t cifs //192.168.1.111/files
 wg-quick down wg0
 systemctl start deluged sabnzbd nzbdrone radarr nzbhydra

@@ -21,7 +21,7 @@ sudo wg
 echo "----------------------"
 echo "--[ Mounting Files ]--"
 echo "----------------------"
-sudo mount -t cifs //192.168.1.111/n1 /vault/n1 -o credentials=/home/nn/.smbvault
+sudo mount -t cifs //192.168.1.111/files /vault/Files -o credentials=/home/nn/.smbvault
 sudo mount -t cifs
 echo "--------------------------------"
 echo "--[ Run Dry-Run Rsync? (y/n) ]--"
@@ -29,7 +29,7 @@ echo "--------------------------------"
 read -p ""
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-  sudo rsync -anzh --inplace --info=progress2 --delete-during --stats --ignore-existing --ignore-errors -s /vault/n1/Files/ /mnt/backup/Files/
+  sudo rsync -anzh --inplace --info=progress2 --delete-during --stats --ignore-existing --ignore-errors -s -e "ssh" --rsync-path="sudo rsync" /vault/Files/ /mnt/backup/Files/
 fi
 echo "-----------------------------"
 echo "--[ Run Real Rsync? (y/n) ]--"
@@ -37,8 +37,8 @@ echo "-----------------------------"
 read -p ""
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-  sudo rsync -avzh --inplace --info=progress2 --delete-during --stats --ignore-existing --ignore-errors -s /vault/n1/Files/ /mnt/backup/Files/
+  sudo rsync -azh --inplace --info=progress2 --delete-during --stats --ignore-existing --ignore-errors -s -e "ssh" --rsync-path="sudo rsync" /vault/Files/ /mnt/backup/Files/
 fi
-sudo umount -t cifs //192.168.1.111/n1
+sudo umount -t cifs //192.168.1.111/files
 sudo wg-quick down wg0
 sudo systemctl start deluged sabnzbd nzbdrone radarr nzbhydra

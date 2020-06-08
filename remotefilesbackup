@@ -29,7 +29,7 @@ echo "--------------------------------"
 read -p ""
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-  sudo rsync -anvzh --inplace --info=progress2 --delete-during --stats --ignore-existing --ignore-errors -s /vault/n1/Files/ /mnt/backup/Files/
+  sudo rsync -anzh --inplace --info=progress2 --delete-during --stats --ignore-existing --ignore-errors -s /vault/n1/Files/ /mnt/backup/Files/
 fi
 echo "-----------------------------"
 echo "--[ Run Real Rsync? (y/n) ]--"

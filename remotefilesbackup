@@ -21,7 +21,7 @@ sudo wg
 echo "----------------------"
 echo "--[ Mounting Files ]--"
 echo "----------------------"
-sudo mount -t cifs //192.168.1.111/files /vault/Files -o credentials=/home/nn/.smbvault
+sudo mount -t cifs //10.0.100.10/files /vault/Files -o credentials=/home/nn/.smbvault
 sudo mount -t cifs
 echo "--------------------------------"
 echo "--[ Run Dry-Run Rsync? (y/n) ]--"
@@ -39,6 +39,6 @@ if [[ $REPLY =~ ^[Yy]$ ]]
 then
   sudo rsync -azh --inplace --info=progress2 --delete-during --stats --ignore-existing --ignore-errors -s -e "ssh" --rsync-path="sudo rsync" /vault/Files/ /mnt/backup/Files/
 fi
-sudo umount -t cifs //192.168.1.111/files
+sudo umount -t cifs //10.0.100.10/files
 sudo wg-quick down wg0
 sudo systemctl start deluged sabnzbd nzbdrone radarr nzbhydra

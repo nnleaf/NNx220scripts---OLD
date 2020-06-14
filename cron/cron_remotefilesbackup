@@ -7,11 +7,16 @@
 #//     ////  //     ////
 #
 #20200602 - Created script for cron to remotely backup Files
+#20200614 - Added confirmation that disks are mounted and logging file
 #
 systemctl stop deluged sabnzbd nzbdrone radarr nzbhydra
 wg-quick up wg0
 mount -t cifs //10.0.100.10/files /vault/Files -o credentials=/home/nn/.smbvault
-rsync -azh --inplace --info=progress2 --delete-during --stats --ignore-existing --ignore-errors -s -e "ssh" --rsync-path="sudo rsync" /vault/Files/ /mnt/backup/Files/
+if grep -qs '/mnt/backup ' /proc/mounts; then
+  if grep -qs '/vault/Files ' /proc/mounts; then
+    rsync -azh --inplace --info=progress2 --delete-during --stats --ignore-existing --ignore-errors -s -e "ssh" --rsync-path="sudo rsync" /vault/Files/ /mnt/backup/Files/ --log-file=/mnt/backup/logs/remote_backup_"$(date +%Y-%m-%d_%H%M%S)".log
+  fi
+fi
 #Cleanup
 umount -t cifs /10.0.100.10/files
 wg-quick down wg0

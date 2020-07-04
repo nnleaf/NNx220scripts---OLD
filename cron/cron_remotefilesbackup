@@ -11,13 +11,13 @@
 #
 systemctl stop deluged sabnzbd nzbdrone radarr nzbhydra
 wg-quick up wg0
-mount -t cifs //10.0.100.10/files /vault/Files -o credentials=/home/nn/.smbvault
+mount -t cifs //10.0.100.10/Files /nnvault/Files -o credentials=/home/nn/.smbnnvault
 if grep -qs '/mnt/backup ' /proc/mounts; then
-  if grep -qs '/vault/Files ' /proc/mounts; then
-    rsync -azh --inplace --info=progress2 --delete-during --stats --ignore-existing --ignore-errors -s -e "ssh" --rsync-path="sudo rsync" /vault/Files/ /mnt/backup/Files/ --log-file=/mnt/backup/logs/remote_backup_"$(date +%Y-%m-%d_%H%M%S)".log
+  if grep -qs '/nnvault/Files ' /proc/mounts; then
+    rsync -azh --inplace --info=progress2 --delete-during --stats --ignore-existing --ignore-errors -s -e "ssh" --rsync-path="sudo rsync" /nnvault/Files/ /mnt/backup/NNVault/Files/ --log-file=/mnt/backup/logs/remote_backup_"$(date +%Y-%m-%d_%H%M%S)".log
   fi
 fi
 #Cleanup
-umount -t cifs /10.0.100.10/files
+umount -t cifs //10.0.100.10/Files
 wg-quick down wg0
 systemctl start deluged sabnzbd nzbdrone radarr nzbhydra

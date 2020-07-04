@@ -19,24 +19,24 @@ echo "--[ Connecting to WireGuard ]--"
 echo "-------------------------------"
 sudo wg-quick up wg0
 sudo wg
-echo "----------------------"
-echo "--[ Mounting Files ]--"
-echo "----------------------"
-sudo mount -t cifs //10.0.100.10/files /vault/Files -o credentials=/home/nn/.smbvault
+echo "------------------------"
+echo "--[ Mounting NNVault ]--"
+echo "------------------------"
+sudo mount -t cifs //10.0.100.10/Files /nnvault/Files -o credentials=/home/nn/.smbnnvault
 echo "---------------------------------------------------"
 echo "--[ Confirming Backup Disk and CIFS are mounted ]--"
 echo "---------------------------------------------------"
 if grep -qs '/mnt/backup ' /proc/mounts; then
   echo "Backup Disk Mounted"
-  if grep -qs '/vault/Files ' /proc/mounts; then
-    echo "Vault CIFS Mounted"
+  if grep -qs '/nnvault/Files ' /proc/mounts; then
+    echo "NNVault Files CIFS Mounted"
     echo "--------------------------------"
     echo "--[ Run Dry-Run Rsync? (y/n) ]--"
     echo "--------------------------------"
     read -p ""
     if [[ $REPLY =~ ^[Yy]$ ]]
     then
-      sudo rsync -anzh --inplace --info=progress2 --delete-during --stats --ignore-existing --ignore-errors -s -e "ssh" --rsync-path="sudo rsync" /vault/Files/ /mnt/backup/Files/ --log-file=/mnt/backup/logs/remote_backup_"$(date +%Y-%m-%d_%H%M%S)".log
+      sudo rsync -anzh --inplace --info=progress2 --delete-during --stats --ignore-existing --ignore-errors -s -e "ssh" --rsync-path="sudo rsync" /nnvault/Files/ /mnt/backup/NNVault/Files/ --log-file=/mnt/backup/logs/remote_backup_"$(date +%Y-%m-%d_%H%M%S)".log
     fi
     echo "-----------------------------"
     echo "--[ Run Real Rsync? (y/n) ]--"
@@ -44,15 +44,15 @@ if grep -qs '/mnt/backup ' /proc/mounts; then
     read -p ""
     if [[ $REPLY =~ ^[Yy]$ ]]
     then
-      sudo rsync -azh --inplace --info=progress2 --delete-during --stats --ignore-existing --ignore-errors -s -e "ssh" --rsync-path="sudo rsync" /vault/Files/ /mnt/backup/Files/ --log-file=/mnt/backup/logs/remote_backup_"$(date +%Y-%m-%d_%H%M%S)".log
+      sudo rsync -azh --inplace --info=progress2 --delete-during --stats --ignore-existing --ignore-errors -s -e "ssh" --rsync-path="sudo rsync" /nnvault/Files/ /mnt/backup/NNVault/Files/ --log-file=/mnt/backup/logs/remote_backup_"$(date +%Y-%m-%d_%H%M%S)".log
     fi
   else
-    echo "Error : Vault CIFS Unmounted"
+    echo "Error : NNVault Files CIFS Unmounted"
   fi
 else
   echo "Error : Backup Disk Unmounted"
 fi
 #Cleanup
-sudo umount -t cifs //10.0.100.10/files
+sudo umount -t cifs //10.0.100.10/Files
 sudo wg-quick down wg0
 sudo systemctl start deluged sabnzbd nzbdrone radarr nzbhydra

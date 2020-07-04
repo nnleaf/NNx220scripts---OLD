@@ -1,0 +1,50 @@
+#!/bin/bash
+#     ////     //  ////     //
+#    // //    //  // //    //
+#   //  //   //  //  //   //
+#  //   //  //  //   //  //
+# //    // //  //    // //
+#//     ////  //     ////
+#
+#20200608 - Created to transfer bookstack files to nnpi
+#
+echo "-----------------------------------------"
+echo "--[ Stopping All Downloading Services ]--"
+echo "-----------------------------------------"
+sudo systemctl stop deluged sabnzbd nzbdrone radarr nzbhydra
+echo "-------------------------------"
+echo "--[ Connecting to WireGuard ]--"
+echo "-------------------------------"
+sudo wg-quick up wg0
+sudo wg
+echo "------------------------"
+echo "--[ Mounting NNVault ]--"
+echo "------------------------"
+sudo mount -t cifs //10.0.100.10/Backup /nnvault/Backup -o credentials=/home/nn/.smbnnvault
+echo "---------------------"
+echo "--[ Mounting NNPi ]--"
+echo "---------------------"
+sudo mount -t cifs //192.168.5.41/bookstack /bookstack -o credentials=/home/nn/.smbnnpi
+echo "-----------------------------------------------"
+echo "--[ Confirming NNVault and NNPi are mounted ]--"
+echo "-----------------------------------------------"
+if grep -qs '/nnvault/Backup ' /proc/mounts; then
+  echo "NNVault Mounted"
+  if grep -qs '/bookstack ' /proc/mounts; then
+  echo "NNPi Mounted"
+  echo "-------------------------------------"
+  echo "--[ Copy Bookstack Backup to NNPi ]--"
+  echo "-------------------------------------"
+  #Copy latest bookstack backup to NNPi
+  sudo cp -v $(ls -t /nnvault/Backup/NNServer/WEB.BookStack/Backup/* | head -1) /bookstack
+  else
+    echo "Error : NNPi Unmounted"
+  fi
+else
+  echo "Error : NNVault Unmounted"
+fi
+#Cleanup
+sudo umount -t cifs //192.168.5.41/bookstack
+sudo umount -t cifs //10.0.100.10/Backup
+sudo wg-quick down wg0
+sudo systemctl start deluged sabnzbd nzbdrone radarr nzbhydra
